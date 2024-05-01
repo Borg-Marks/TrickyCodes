@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Field Indicator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
+  .container {
+    text-align: center;
+    margin-top: 50px;
+    position: relative;
+  }
+  .indicator {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .line {
+    position: absolute;
+    width: 200px;
+    height: 2px;
+    background-color: black;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -20px; /* Adjust this value as needed */
+  }
+  .arrow {
+    position: absolute;
+    top: -10px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="indicator">Current Value: <span id="valueIndicator">0</span></div>
+  <input type="number" id="textField" value="0">
+  <div class="line" id="line">
+    <div class="arrow" id="arrow"></div>
+  </div>
+</div>
+
+<script>
+  // Get elements
+  const textField = document.getElementById('textField');
+  const valueIndicator = document.getElementById('valueIndicator');
+  const line = document.getElementById('line');
+  const arrow = document.getElementById('arrow');
+
+  let isDragging = false;
+
+  // Update indicator when input value changes
+  textField.addEventListener('input', function() {
+    valueIndicator.textContent = textField.value;
+  });
+
+  // Add event listeners for dragging
+  arrow.addEventListener('mousedown', startDragging);
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', stopDragging);
+
+  // Functions for dragging
+  function startDragging(e) {
+    isDragging = true;
+  }
+
+  function drag(e) {
+    if (isDragging) {
+      const lineRect = line.getBoundingClientRect();
+      let newPosition = e.clientX - lineRect.left;
+      if (newPosition < 0) newPosition = 0;
+      if (newPosition > lineRect.width) newPosition = lineRect.width;
+      const percentage = newPosition / lineRect.width;
+      const max = parseInt(textField.max || 100);
+      const min = parseInt(textField.min || 0);
+      const newValue = Math.round((max - min) * percentage + min);
+      textField.value = newValue;
+      valueIndicator.textContent = newValue;
+      arrow.style.left = newPosition + 'px';
+    }
+  }
+
+  function stopDragging() {
+    isDragging = false;
+  }
+</script>
+</body>
+</html>
